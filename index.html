@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#1f4937">
+  <meta name="description" content="青禾农业数字孪生：空田自动播种、无人机灌溉施肥、手动无人车采摘、大屏旁集货、无人机转运与输送入库的 Three.js 协同农场。">
+  <title>青禾 · 农业数字孪生</title>
+  <link rel="icon" type="image/svg+xml" href="./bin/favicon.svg">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <aside class="rail" aria-label="主导航">
+    <a class="brand" href="./index.html" aria-label="青禾首页"><svg viewBox="0 0 32 32" fill="none"><path d="M16 27V12M16 18C5 18 5 6 5 6s12-1 11 12ZM16 14C16 4 27 4 27 4s1 11-11 13" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+    <span class="rail-name">青禾</span>
+    <nav>
+      <button class="nav-item active" data-nav="overview" title="农场总览"><i data-icon="overview"></i><span>总览</span></button>
+      <button class="nav-item" data-nav="fields" title="田块监测"><i data-icon="sprout"></i><span>田块</span></button>
+      <button class="nav-item" data-nav="fleet" title="无人机调度"><i data-icon="drone"></i><span>机队</span></button>
+      <button class="nav-item" data-nav="logistics" title="采收与仓储"><i data-icon="warehouse"></i><span>仓储</span></button>
+      <button class="nav-item" data-nav="logs" title="作业记录"><i data-icon="logs"></i><span>记录</span></button>
+    </nav>
+    <div class="rail-bottom"><button id="help-button" class="nav-item" title="操作指引"><i data-icon="help"></i><span>帮助</span></button><div class="avatar">QH</div></div>
+  </aside>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="breadcrumb">青禾智慧农业 <span>/</span> <strong>数字孪生控制台</strong></div>
+      <div class="topbar-right"><span class="live"><b></b>系统运行正常</span><span class="separator"></span><i data-icon="sun"></i><span>24°C <span class="muted">晴</span></span><span class="separator"></span><time id="clock">--:--:--</time></div>
+    </header>
+    <main>
+      <section class="page-title">
+        <div><div class="eyebrow">QINGHE · SMART FARM</div><h1>农场数字孪生<span class="title-dot"></span></h1><p>连接每一寸土地，让农业管理更从容。</p></div>
+        <div class="title-actions"><span class="simulation-tag"><i data-icon="layers"></i>实时模拟</span><button id="guide-button" class="button secondary"><i data-icon="help"></i>操作指引</button></div>
+      </section>
+      <section class="metrics" aria-label="农场概览">
+        <div class="metric"><span class="metric-icon sage"><i data-icon="fields"></i></span><div><span class="metric-label">监测田块</span><div class="metric-value">04 <small>块</small></div></div><span class="metric-note" id="ripe-count">3 块可采收</span></div>
+        <div class="metric"><span class="metric-icon mint"><i data-icon="drone"></i></span><div><span class="metric-label">无人机在线</span><div class="metric-value"><span id="online-count">07</span> <small>/ 07</small></div></div><span class="metric-note green" id="fleet-note">另有 1 辆无人车</span></div>
+        <div class="metric"><span class="metric-icon blue"><i data-icon="droplet"></i></span><div><span class="metric-label">平均土壤湿度</span><div class="metric-value"><span id="avg-moisture">50.3</span><small>%</small></div></div><svg class="spark" viewBox="0 0 74 32"><path d="M0 26 10 23 20 25 30 15 40 18 50 9 60 11 74 3"/></svg></div>
+        <div class="metric"><span class="metric-icon sand"><i data-icon="irrigation"></i></span><div><span class="metric-label">本次累计灌溉</span><div class="metric-value"><span id="water-used">0.0</span> <small>L</small></div></div><span class="metric-note" id="mission-count">0 次作业</span></div>
+      </section>
+      <div class="workflow-banner" aria-label="农场协作流程"><span><i data-icon="sprout"></i>01 空田按计划播种</span><b>›</b><span><i data-icon="leaf"></i>02 施肥加速成熟</span><b>›</b><span><i data-icon="rover"></i>03 手动无人车采摘</span><b>›</b><span><i data-icon="pin"></i>04 大屏旁集货</span><b>›</b><span><i data-icon="drone"></i>05 无人机转运入库</span></div>
+      <section class="workspace">
+        <div class="scene-panel">
+          <div class="scene-topline"><div><span class="section-index">01</span><h2>农场实景</h2><span class="thin-label">LIVE TWIN</span></div><div class="scene-status"><span class="status-dot"></span>数据同步中 <span class="sim-time" id="sim-time">00:00</span></div></div>
+          <div id="scene" aria-label="三维农场，可拖动旋转、滚轮缩放，点击田块选择目标">
+            <div id="loading" class="loading"><div class="loading-orbit"></div><strong>正在连接你的数字农场</strong><span>构建地形与无人机模型…</span></div>
+            <div class="scene-badge"><span class="badge-mark"><i data-icon="sprout"></i></span><div><strong>青禾示范农场</strong><span>农业无人机协同作业区</span></div></div>
+            <div class="scene-view-controls"><button id="view-top" title="俯视视角" aria-label="俯视视角"><i data-icon="topview"></i></button><button id="view-reset" title="恢复默认视角" aria-label="恢复默认视角"><i data-icon="focus"></i></button><button id="view-river" title="河岸视角" aria-label="河岸视角"><i data-icon="droplet"></i></button><span></span><button id="zoom-in" title="放大" aria-label="放大"><i data-icon="plus"></i></button><button id="zoom-out" title="缩小" aria-label="缩小"><i data-icon="minus"></i></button></div>
+            <div class="scene-compass"><span>N</span><svg viewBox="0 0 40 40"><path d="m20 5 6 26-6-5-6 5Z" fill="#2b5c43"/><path d="m20 5 0 21-6 5Z" fill="#7fa48d"/></svg></div>
+            <div class="scene-bottom"><span><i data-icon="mouse"></i>拖动旋转 · 滚轮缩放 · 点击田块</span><div class="playback"><button id="pause-button" title="暂停模拟" aria-label="暂停模拟"><i data-icon="pause"></i></button><button id="speed-button" title="切换模拟速度">1×</button><span class="playback-line"></span><span id="render-info">PBR · 实时渲染</span></div></div>
+            <div id="field-popup" class="field-popup" hidden></div>
+          </div>
+          <div class="scene-footer"><div class="legend"><span><b class="legend-square"></b>作物种植区</span><span><b class="legend-line"></b>无人机航线</span><span><b class="legend-circle"></b>调度 / 充电站</span><span><b class="legend-belt"></b>采收物流区</span></div><label class="lighting-control"><i data-icon="sun"></i><select id="light-preset" aria-label="场景光照"><option value="daylight">自然日光</option><option value="golden">暖阳斜照</option></select></label></div>
+        </div>
+        <aside class="control-panel" id="fleet-panel">
+          <div class="panel-title"><div><span class="section-index">02</span><h2>协同作业调度</h2></div><span class="online-tag"><b></b>7 机 · 1 车</span></div>
+          <div class="fleet-tabs" role="tablist" aria-label="作业类型"><button id="seeder-tab" role="tab" aria-selected="true" aria-controls="seeder-controls"><i data-icon="sprout"></i>播种无人机 <small>01</small></button><button id="irrigation-tab" role="tab" aria-selected="false" aria-controls="irrigation-controls"><i data-icon="droplet"></i>灌溉机队 <small>04</small></button><button id="fertilizer-tab" role="tab" aria-selected="false" aria-controls="fertilizer-controls"><i data-icon="leaf"></i>施肥无人机 <small>01</small></button><button id="robot-tab" role="tab" aria-selected="false" aria-controls="robot-controls"><i data-icon="rover"></i>采摘无人车 <small>01</small></button><button id="harvest-tab" role="tab" aria-selected="false" aria-controls="harvest-controls"><i data-icon="drone"></i>货运无人机 <small>01</small></button></div>
+          <section id="seeder-controls" class="tab-content" role="tabpanel" aria-labelledby="seeder-tab">
+            <div class="harvest-aircraft"><div class="harvest-aircraft-icon seed-icon"><i data-icon="sprout"></i></div><div><strong>SEED-01</strong><span>双口排种 · 六行覆盖 · 独立补种位</span></div><span id="seed-air-state" class="harvester-state">待命中</span></div>
+            <div class="harvest-resources"><span><i data-icon="battery"></i>电量 <b id="seed-battery">100%</b></span><span>种仓 <b id="seed-payload">100%</b></span></div>
+            <div class="auto-row seed-auto"><div><strong>全自动播种</strong><span>采空后按下季计划自动起飞</span></div><button id="seed-auto" class="switch" role="switch" aria-label="全自动播种" aria-checked="false"><span></span></button></div>
+            <fieldset class="seed-plan"><legend>下季播种计划</legend><p>为每块田选作物，或跳过不播。</p><div id="seed-plan"></div></fieldset>
+            <div class="harvest-form seed-form"><label for="seed-target">单次播种田块</label><div class="select-wrap"><i data-icon="fields"></i><select id="seed-target"></select><i data-icon="chevron"></i></div><div class="dispatch-actions"><button id="seed-dispatch" class="button primary" disabled><i data-icon="send"></i>立即播种</button><button id="seed-return" class="button secondary" disabled><i data-icon="home"></i>返航补种</button></div></div>
+            <div class="seed-status"><div><strong id="seed-progress-label">手动待命</strong><small id="seed-progress-value">已播 0 块次</small></div><div class="growth-track"><span id="seed-bar"></span></div><p id="seed-instruction">须先用采摘无人车收完本田作物。</p></div>
+            <div class="harvest-view-buttons"><button id="follow-seeder" aria-pressed="false"><i data-icon="focus"></i>跟随播种机</button><button id="seed-open-rover"><i data-icon="rover"></i>调度采摘无人车</button></div>
+          </section>
+          <div id="irrigation-controls" hidden class="tab-content" role="tabpanel" aria-labelledby="irrigation-tab">
+          <div class="auto-row"><div><strong>智能灌溉</strong><span>按土壤湿度自动分配任务</span></div><button id="auto-toggle" class="switch" role="switch" aria-checked="false" aria-label="智能灌溉"><span></span></button></div>
+          <div id="drone-list" class="drone-list" aria-label="无人机列表"></div>
+          <div class="dispatch-form">
+            <div class="dispatch-title"><strong id="selected-drone-name">UAV-01</strong><span>任务设置</span></div>
+            <label for="target-field">目标田块</label>
+            <div class="select-wrap"><i data-icon="pin"></i><select id="target-field"><option value="0">A01 · 玉米种植区</option><option value="1">A02 · 番茄种植区</option><option value="2">A03 · 胡萝卜种植区</option><option value="3">A04 · 土豆种植区</option></select><i data-icon="chevron"></i></div>
+            <div class="dispatch-actions"><button class="button primary" id="dispatch-button"><i data-icon="send"></i>前往灌溉</button><button class="button secondary" id="return-button"><i data-icon="home"></i>返航充电</button></div>
+          </div>
+          <div class="batch-actions"><button id="dispatch-all"><i data-icon="play"></i>全队灌溉</button><span></span><button id="return-all"><i data-icon="return"></i>全队返航</button></div>
+          </div>
+          <div id="fertilizer-controls" class="tab-content" role="tabpanel" aria-labelledby="fertilizer-tab" hidden>
+            <div class="harvest-aircraft"><div class="harvest-aircraft-icon fertilizer-icon"><i data-icon="leaf"></i></div><div><strong>FERT-01</strong><span>精准撒肥 · 成熟加速 · 独立补给</span></div><span id="fertilizer-state" class="harvester-state">待命中</span></div>
+            <div class="harvest-resources"><span><i data-icon="battery"></i>电量 <b id="fertilizer-battery">100%</b></span><span>肥料 <b id="fertilizer-payload">100%</b></span></div>
+            <div class="harvest-view-buttons"><button id="follow-fertilizer" aria-pressed="false"><i data-icon="focus"></i>跟随施肥机</button><button id="fertilizer-field-view"><i data-icon="fields"></i>查看目标田块</button></div>
+            <div class="operation-note"><b>让作物更快成熟</b>施肥后提供持续 180 秒的 <strong>3×</strong> 成熟增益；土壤养分与成熟度会同步更新。</div>
+            <div class="harvest-form"><label for="fertilizer-target">施肥田块</label><div class="select-wrap"><i data-icon="pin"></i><select id="fertilizer-target"><option value="0">A01 · 玉米</option><option value="1">A02 · 番茄</option><option value="2" selected>A03 · 胡萝卜</option><option value="3">A04 · 土豆</option></select><i data-icon="chevron"></i></div><div class="dispatch-actions"><button id="fertilizer-dispatch" class="button primary"><i data-icon="send"></i>开始施肥</button><button id="fertilizer-return" class="button secondary"><i data-icon="home"></i>返航补给</button></div></div>
+            <div class="agronomy-panel"><div class="inventory-title"><span><i data-icon="sprout"></i>目标田块生长监测</span><span id="fertilizer-field-code">A03</span></div><div class="growth-number"><b id="fertilizer-maturity">76.0</b><span>% 成熟度</span><strong id="fertilizer-boost">1×</strong></div><div class="growth-track"><span id="fertilizer-maturity-bar" style="width:76%"></span></div><div class="agronomy-stats"><span>土壤养分 <b id="fertilizer-nutrients">30%</b></span><span>土壤湿度 <b id="fertilizer-moisture">36%</b></span><span>剩余肥效 <b id="fertilizer-effect">0 s</b></span><span>累计施肥 <b id="fertilizer-total">0 kg</b></span></div></div>
+            <p class="panel-footnote">所有时长均为模拟时间；已成熟或采完的田块无需施肥。</p>
+          </div>
+          <div id="robot-controls" class="tab-content" role="tabpanel" aria-labelledby="robot-tab" hidden>
+            <div class="harvest-aircraft"><div class="harvest-aircraft-icon robot-icon"><i data-icon="rover"></i></div><div><strong>ROVER-01</strong><span>六轮无人车 · 手动采摘 · 25 kg / 批</span></div><span id="robot-state" class="harvester-state">待命中</span></div>
+            <div class="harvest-resources"><span><i data-icon="battery"></i>电量 <b id="robot-battery">100%</b></span><span id="robot-load">空载</span></div>
+            <div class="harvest-view-buttons"><button id="follow-robot" aria-pressed="false"><i data-icon="focus"></i>跟随无人车</button><button id="robot-stage-view"><i data-icon="pin"></i>查看大屏集货区</button></div>
+            <div class="operation-note"><b>采摘由你手动确认</b>无人车在田边停稳后才展开机械臂。成熟度达到 90% 时，可一次采完本田，整车送到大屏旁。</div>
+            <div class="harvest-form"><label for="robot-target">机器人目标田块</label><div class="select-wrap"><i data-icon="fields"></i><select id="robot-target"><option value="0">A01 · 玉米</option><option value="1">A02 · 番茄</option><option value="2">A03 · 胡萝卜</option><option value="3">A04 · 土豆</option></select><i data-icon="chevron"></i></div><label class="pick-mode" for="robot-mode">本次采摘范围</label><div class="select-wrap"><i data-icon="arm"></i><select id="robot-mode"><option value="all">整田采摘 · 一趟集货</option><option value="single">只采一批 · 25 kg</option></select><i data-icon="chevron"></i></div><div class="dispatch-actions"><button id="robot-drive" class="button primary"><i data-icon="rover"></i>驾驶前往</button><button id="robot-pick" class="button secondary" disabled><i data-icon="arm"></i>开始采摘</button></div><button id="robot-return" class="button secondary full-button"><i data-icon="home"></i>返回总站</button></div>
+            <div class="robot-workflow"><span id="robot-instruction">选择田块，点击「驾驶前往」</span><div class="growth-track"><span id="robot-progress" style="width:0%"></span></div><small id="robot-progress-label">等待手动调度</small></div>
+            <div class="agronomy-panel"><div class="inventory-title"><span><i data-icon="pin"></i>大屏旁集货区</span><span id="robot-field-code">A01</span></div><div class="robot-counters"><div><b id="robot-unpicked">4</b><span>未采批次</span></div><div><b id="robot-staged">0</b><span>待转运批次</span></div><div><b id="robot-picked-total">0</b><span>累计采摘</span></div></div><div class="bulk-dispatch"><div><strong>全场整车清运</strong><span id="bulk-count">待清运 0 批 · 0 kg</span></div><p>一次巡访各大屏，收齐尚未分配的货箱，整车送到传送带。</p><button id="robot-haul" class="button primary full-button" disabled><i data-icon="rover"></i>清运全部待运货物</button></div><button id="switch-to-transport" class="button secondary full-button"><i data-icon="drone"></i>调度无人机转运</button></div>
+          </div>
+          <div id="harvest-controls" class="tab-content" role="tabpanel" aria-labelledby="harvest-tab" hidden>
+            <div class="harvest-aircraft"><div class="harvest-aircraft-icon"><i data-icon="arm"></i></div><div><strong>HARV-01</strong><span>六旋翼货运 · 大屏旁提货 · 25 kg / 批</span></div><span id="harvester-state" class="harvester-state">待命中</span></div>
+            <div class="harvest-resources"><span><i data-icon="battery"></i>电量 <b id="harvester-battery">100%</b></span><span id="harvest-load">空载</span></div>
+            <div class="harvest-view-buttons"><button id="follow-harvester" aria-pressed="false"><i data-icon="focus"></i>跟随货运机</button><button id="warehouse-view"><i data-icon="warehouse"></i>仓库视角</button></div>
+            <div class="auto-row harvest-auto"><div><strong>自动转运入库</strong><span>仅转运无人车已采摘并集货的作物</span></div><button id="harvest-auto" class="switch" role="switch" aria-checked="false" aria-label="自动转运入库"><span></span></button></div>
+            <div class="harvest-form"><label for="harvest-target">提货集货区</label><div class="select-wrap"><i data-icon="leaf"></i><select id="harvest-target"><option value="0">A01 · 玉米</option><option value="1">A02 · 番茄</option><option value="2">A03 · 胡萝卜</option><option value="3">A04 · 土豆</option></select><i data-icon="chevron"></i></div><div class="dispatch-actions"><button id="harvest-dispatch" class="button primary"><i data-icon="arm"></i>前往转运</button><button id="harvest-return" class="button secondary"><i data-icon="home"></i>返航待命</button></div></div>
+            <div class="harvest-pipeline" aria-label="转运进度"><div data-harvest-step="0"><span>01</span><div><strong>大屏旁提货</strong><small id="staging-summary">等待机器人采摘并集货</small></div><i data-icon="check"></i></div><div data-harvest-step="1"><span>02</span><div><strong>空运投放</strong><small>飞往传送带，释放作物</small></div><i data-icon="check"></i></div><div data-harvest-step="2"><span>03</span><div><strong>传送入库</strong><small id="belt-progress">传送带待机</small></div><i data-icon="check"></i></div></div>
+            <div class="warehouse-inventory"><div class="inventory-title"><span><i data-icon="warehouse"></i>农产品仓库</span><span id="inventory-batches">0 批入库</span></div><div class="inventory-weight"><b id="inventory-weight">0</b><span>kg <small>累计入库</small></span></div><div class="inventory-crops" id="inventory-crops"></div><p>货物通过传送带抵达仓内后计入库存。</p></div>
+          </div>
+        </aside>
+      </section>
+      <section class="fields-section" id="fields-section"><div class="fields-heading"><div><span class="section-index">03</span><h2>田块生长监测</h2><span class="thin-label">CROP INSIGHTS</span></div><span><span class="status-dot"></span>每秒动态更新 <small>· 演示数据</small></span></div><div id="field-cards" class="field-cards"></div></section>
+      <footer class="page-footer"><span>QINGHE <b>青禾</b> <span>让土地被看见，让生长有迹可循。</span></span><span>数字孪生演示 <b>·</b> 数据与作业均为本地模拟</span></footer>
+    </main>
+  </div>
+  <div id="toast-area" class="toast-area" aria-live="polite"></div>
+  <dialog id="info-dialog"><div class="dialog-head"><div><div class="eyebrow">QINGHE OPERATIONS</div><h2 id="dialog-title">操作指引</h2></div><button id="close-dialog" class="icon-button" aria-label="关闭"><i data-icon="close"></i></button></div><div id="dialog-content"></div></dialog>
+  <script defer src="./bin/three.js"></script>
+  <script defer src="./bin/conveyor.js"></script>
+  <script defer src="./bin/detail.js"></script>
+  <script defer src="./bin/fertilizer.js"></script>
+  <script defer src="./bin/ground-nav.js"></script>
+  <script defer src="./bin/harvest.js"></script>
+  <script defer src="./bin/lighting.js"></script>
+  <script defer src="./bin/river.js"></script>
+  <script defer src="./bin/robot.js"></script>
+  <script defer src="./bin/seeding.js"></script>
+  <script defer src="./bin/seed-panel.js"></script>
+  <script defer src="./bin/simulation.js"></script>
+  <script defer src="./bin/world.js"></script>
+  <script defer src="./script.js"></script>
+</body>
+</html>
